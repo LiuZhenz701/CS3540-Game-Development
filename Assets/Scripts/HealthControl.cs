@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HealthControl : MonoBehaviour {
-
+    public Slider playerHealthBar;
+    public Slider enemyHealthBar;
+    
     public int playerHP = 100;
     public int enemyHP = 100;
 
@@ -17,8 +20,11 @@ public class HealthControl : MonoBehaviour {
 
     void Update () {
         if (playerCurHP <= 0) {
-            //game lost, player died;
+            FindObjectOfType<LevelManager>().GameLost();
         }
+
+        playerHealthBar.value = playerCurHP;
+        enemyHealthBar.value = enemyCurHP;
     }
 
     void playerHit(int dmgAmount) {
