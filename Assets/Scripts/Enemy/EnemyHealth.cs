@@ -9,16 +9,10 @@ public class EnemyHealth : MonoBehaviour
     public int currentHealth;
     public Slider healthSlider;
 
-    private void Awake()
-    {
-        GameObject slider1 = GameObject.FindWithTag("EnemyHP");
-        if(slider1 != null)
-        {
-            healthSlider = GetComponent<Slider>();
-        }
-    }
+  
     void Start()
     {
+        GameObject slider1 = GameObject.FindWithTag("EnemyHP");
         currentHealth = startingHealth;
         healthSlider.value = currentHealth;
     }

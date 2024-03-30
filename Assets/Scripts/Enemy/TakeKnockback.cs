@@ -8,30 +8,26 @@ public class TakeKnockback : MonoBehaviour
     public float knockbackForce = 10f;
 
 
-    public void Update()
+
+
+    // Function to apply knockback force
+    public void ApplyKnockback(GameObject other)
     {
+
+        StartCoroutine(ApplyKnockbackEnemy(other));
         
     }
 
-    private void OnCollisionEnter(Collision collision) 
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            print("collision");
-            if (collision.gameObject.GetComponent<MiaController>().isPunching ||
-                collision.gameObject.GetComponent<MiaController>().isKicking)
-            {
-                // Calculate the knockback direction from the player's position to this object's position
-                Vector3 direction = transform.position - collision.gameObject.transform.position;
-                ApplyKnockback(direction);
-            }
-            
-        }
 
-    }
-    // Function to apply knockback force
-    public void ApplyKnockback(Vector3 direction)
+    IEnumerator ApplyKnockbackEnemy(GameObject other)
     {
+        yield return new WaitForSeconds(.5f);
+        ApplyKnockbackEnemyEnd(other);
+    }
+
+    public void ApplyKnockbackEnemyEnd(GameObject other)
+    {
+        Vector3 direction = transform.position - other.transform.position;
         // Apply knockback force in the specified direction
         GetComponent<Rigidbody>().AddForce(direction.normalized * knockbackForce, ForceMode.Impulse);
     }

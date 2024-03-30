@@ -21,6 +21,7 @@ namespace TPC
         public float gravity = 10f;
         public float airControl = 5f;
         public float airtimeThreshold;
+        public float padForce = 10f;
         [Header("Inputs")]
         public float horizontal;
         public float vertical;
@@ -45,6 +46,9 @@ namespace TPC
         public bool hasKickInput;
         public bool isPunching;
         public bool isKicking;
+        public bool isOnJumpPad;
+        private Coroutine speedBoostCoroutine;
+
 
         #endregion
 
@@ -205,6 +209,67 @@ namespace TPC
             anim.SetBool(StaticVars.mirrorJump, relativeLeftFoot.z > relativeRightFoot.z);
 
         }
+
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("SpeedPickup"))
+            {
+                Debug.Log("Speed pickup collected");
+
+                // Start the speed boost coroutine if it's not already running
+                if (speedBoostCoroutine == null)
+                {
+                    speedBoostCoroutine = StartCoroutine(SpeedBoostCoroutine());
+                }
+                else
+                {
+                    // Restart the coroutine if the speed boost is already active
+                    StopCoroutine(speedBoostCoroutine);
+                    speedBoostCoroutine = StartCoroutine(SpeedBoostCoroutine());
+                }
+            }
+            else if (other.CompareTag("BouncePad"))
+            {
+                Debug.Log("Bounce Pad hit");
+
+                // Check if the character controller is not null and the player is grounded
+                if (controller != null && controller.isGrounded)
+                {
+                    // Apply vertical force to make the character jump
+                    Vector3 jumpVelocity = Vector3.up * jumpForce;
+                    controller.Move(jumpVelocity * Time.deltaTime * padForce);
+
+                    // Set the isJumping flag to true
+                    isJumping = true;
+                    anim.SetBool("inAir", true);
+
+                }
+            }
+        }
+
+        private IEnumerator SpeedBoostCoroutine()
+        {
+            Debug.Log("Speed boost activated");
+
+            // Apply the speed boost here
+            float originalWalkSpeed = walkSpeed;
+            walkSpeed *= 1.2f; // Double the walk speed temporarily
+            float originalSprintSpeed = sprintSpeed;
+            sprintSpeed *= 1.2f;
+            // Wait for the specified duration (10 seconds in this case)
+            yield return new WaitForSeconds(5f);
+
+            // Revert the speed back to its original value after the duration
+            walkSpeed = originalWalkSpeed;
+
+            // Reset the coroutine reference
+            speedBoostCoroutine = null;
+
+            Debug.Log("Speed boost deactivated");
+        }
+
+
     }
 
 

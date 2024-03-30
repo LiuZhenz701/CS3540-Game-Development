@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TPC;
 using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
@@ -10,6 +11,7 @@ public class EnemyAI : MonoBehaviour
         Patrol,
         Chase,
         Attack,
+        Hit,
         Dead
     }
 
@@ -22,11 +24,14 @@ public class EnemyAI : MonoBehaviour
 
     public float enemySpeed = 5;
     public float chaseDistance = 10;
+    public float grandmaRunSpeed = 5;
     public GameObject player;
     public float attackDistance = 5;
+    public GameObject levelManagerObject;
+    bool isYelling;
+    bool isGettingHit;
 
-
-    EnemyHealth enemyHealth;
+    HealthControl healthControl;
     int health;
     Transform deadTransform;
     bool isDead;
@@ -36,11 +41,11 @@ public class EnemyAI : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        wanderPoints = GameObject.FindGameObjectsWithTag("WanderPoint");
+        wanderPoints = GameObject.FindGameObjectsWithTag("Wanderpoint");
         anim = GetComponent<Animator>();
 
-        enemyHealth = GetComponent<EnemyHealth>();
-        health = enemyHealth.currentHealth;
+        GameObject levelManager = GameObject.FindGameObjectWithTag("LevelManager");
+        healthControl = levelManager.GetComponent<HealthControl>();
 
         isDead = false;
 
@@ -50,33 +55,43 @@ public class EnemyAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        health = healthControl.enemyCurHP;
+        IsHit();
+        Debug.Log(health);
 
-        health = enemyHealth.currentHealth;
-
-        switch(currentState)
+        if (health <= 0)
         {
+            currentState = FSMStates.Dead;
+        }
+        
+        
+        switch (currentState)
+        {
+
             case FSMStates.Patrol:
                 UpdatePatrolState();
                 break;
-            /**
+
             case FSMStates.Chase:
                 UpdateChaseState();
                 break;
             case FSMStates.Attack:
                 UpdateAttackState();
                 break;
-            */
+
             case FSMStates.Dead:
                 UpdateDeadState();
                 break;
+            case FSMStates.Hit:
+                UpdateHitState();
+                break;
         }
-        elapsedTime += Time.deltaTime;
+            
+        
 
-        if(health <= 0)
-        {
-            currentState = FSMStates.Dead;
-        }
+        elapsedTime += Time.deltaTime;
     }
 
     void Initialize()
@@ -94,12 +109,12 @@ public class EnemyAI : MonoBehaviour
         {
             FindNextPoint();
         }
-        /*
+        
         else if(distanceToPlayer <= chaseDistance)
         {
             currentState = FSMStates.Chase;
         }
-        */
+        
         FaceTarget(nextDestination);
 
         transform.position = Vector3.MoveTowards(transform.position, nextDestination, enemySpeed * Time.deltaTime);
@@ -107,7 +122,7 @@ public class EnemyAI : MonoBehaviour
     }
     void UpdateChaseState()
     {
-        anim.SetInteger("animState", 2);
+        anim.SetInteger("animState", 3);
         nextDestination = player.transform.position;
 
         if (distanceToPlayer <= attackDistance)
@@ -120,35 +135,91 @@ public class EnemyAI : MonoBehaviour
         }
         FaceTarget(nextDestination);
 
-        //transform.position = Vector3.MoveTowards(transform.position, nextDestination, enemySpeed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, nextDestination, grandmaRunSpeed * Time.deltaTime);
     }
     void UpdateAttackState()
     {
         print("Attacking!");
-        anim.SetInteger("animState", 2);
+        
+        isYelling = true;
+        anim.SetInteger("animState", 6);
         nextDestination = player.transform.position;
-
-        if(distanceToPlayer <= attackDistance)
+        if (distanceToPlayer <= attackDistance)
         {
             currentState = FSMStates.Attack;
         }
-        else if(distanceToPlayer > attackDistance && distanceToPlayer <= chaseDistance)
+        else if (distanceToPlayer > attackDistance && distanceToPlayer <= chaseDistance)
         {
             currentState = FSMStates.Chase;
         }
-        else if(distanceToPlayer > chaseDistance)
+        else if (distanceToPlayer > chaseDistance)
         {
-            currentState= FSMStates.Patrol;
+            currentState = FSMStates.Patrol;
         }
+        if (health <= 0)
+        {
+            currentState = FSMStates.Dead;
+        }
+        
+
         FaceTarget(nextDestination);
-        anim.SetInteger("animState", 3);
+    }
+
+    void UpdateHitState()
+    {
+        
+        anim.SetInteger("animState", 5);
+
+        TakeKnockback takeKnockback = GetComponent<TakeKnockback>();
+
+        takeKnockback.ApplyKnockback(player);
+        bool playerIsAttacking = player.GetComponent<MiaController>().isPunching || player.GetComponent<MiaController>().isKicking;
+        
+        if (distanceToPlayer <= attackDistance && !playerIsAttacking)
+        {
+            currentState = FSMStates.Attack;
+        }
+        else if (distanceToPlayer > attackDistance && !playerIsAttacking)
+        {
+            currentState = FSMStates.Chase;
+        }
+        else if (distanceToPlayer > chaseDistance)
+        {
+            currentState = FSMStates.Patrol;
+        }
+        
+        
+
+    }
+
+    void IsHit()
+    {
+        bool playerIsAttacking = player.GetComponent<MiaController>().isPunching || player.GetComponent<MiaController>().isKicking;
+        if  (distanceToPlayer <= attackDistance && playerIsAttacking)
+        {
+            currentState = FSMStates.Hit;
+            healthControl.enemyHit(1);
+            if (!isGettingHit)
+            {
+                isGettingHit = true;
+                StartCoroutine(EndGettingHit());
+            }
+            
+        }
+ 
+    }
+    IEnumerator EndGettingHit()
+    {
+        yield return new WaitForSeconds(1.5f);
+        isGettingHit = false;
     }
     void UpdateDeadState()
     {
         anim.SetInteger("animState", 4);
         deadTransform = gameObject.transform;
         isDead = true;
-        Destroy(gameObject, 3);
+        GameObject levelManagerObject = GameObject.FindGameObjectWithTag("LevelManager");
+        levelManagerObject.GetComponent<LevelManager>().GameWin();
     }
 
     void FindNextPoint()
@@ -174,4 +245,17 @@ public class EnemyAI : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, chaseDistance);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

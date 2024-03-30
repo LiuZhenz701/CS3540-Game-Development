@@ -13,12 +13,12 @@ public class HealthControl : MonoBehaviour {
     public int playerCurHP;
     public int enemyCurHP;
 
-    void Start () {
-        playerCurHP = playerHP -= 30;
+    public void Start () {
+        playerCurHP = playerHP;
         enemyCurHP = enemyHP;
     }
 
-    void Update () {
+    public void Update () {
         if (playerCurHP <= 0) {
             FindObjectOfType<LevelManager>().GameLost();
         }

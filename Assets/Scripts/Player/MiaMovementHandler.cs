@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TPC;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Windows;
@@ -61,7 +60,7 @@ public class MiaMovementHandler : MonoBehaviour
         Vector3 h = miaInputHandler.mainCamera.transform.right * miaController.horizontal;
         Vector3 v = miaInputHandler.mainCamera.transform.forward * miaController.vertical;
         // Set y to 0 if not in the air
-        if (miaController.onGround)
+        if (miaController.onGround && !miaController.isOnJumpPad)
         {
             h.y = 0;
             v.y = 0;
