@@ -31,6 +31,8 @@ public class MiaHitbox : MonoBehaviour
             if (!gotHitAlready)
             {
                 gotHitAlready = true;
+                healthControl.playerHit();
+
                 AudioSource.PlayClipAtPoint(miaHitSFX, Camera.main.transform.position, .25f);
 
                 StartCoroutine(GetHit());
@@ -40,7 +42,6 @@ public class MiaHitbox : MonoBehaviour
     IEnumerator GetHit()
     {
         yield return new WaitForSeconds(1f);
-        healthControl.playerHit(10);
         print("enemy hit player connected");
         blinkTimer = blinkDuration;
         gotHitAlready = false;

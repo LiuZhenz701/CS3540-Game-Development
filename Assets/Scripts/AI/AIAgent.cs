@@ -23,7 +23,7 @@ public class AIAgent : MonoBehaviour
     {
         if (states.isGettingHit)
         {
-            states.currentState = AIStates.FSMStates.Hit;
+            states.currentState = AIStates.FSMStates.Attack;
         }
       
      
@@ -39,9 +39,7 @@ public class AIAgent : MonoBehaviour
             case AIStates.FSMStates.Attack:
                 UpdateAttackState();
                 break;
-            case AIStates.FSMStates.Hit:
-                UpdateHitState();
-                break;
+            
         }
 
     }
@@ -55,6 +53,10 @@ public class AIAgent : MonoBehaviour
 
         else if (states.distanceToPlayer <= states.chaseDistance && IsPlayedInClearFOV())
         {states.currentState = AIStates.FSMStates.Chase;}
+        else if (states.distanceToPlayer <= states.attackDistance)
+        {
+            states.currentState = AIStates.FSMStates.Attack;
+        }
 
       //  FaceTarget(states.nextDestination);
         states.agent.destination = states.nextDestination;
@@ -69,7 +71,7 @@ public class AIAgent : MonoBehaviour
         {
             states.currentState = AIStates.FSMStates.Attack;
         }
-        else if (states.distanceToPlayer > states.chaseDistance)
+        else if (states.distanceToPlayer > states.chaseDistance && !IsPlayedInClearFOV())
         {
             states.currentState = AIStates.FSMStates.Patrol;
             FindNextPoint();
@@ -92,17 +94,18 @@ public class AIAgent : MonoBehaviour
             states.currentState = AIStates.FSMStates.Chase;
             states.agent.speed = states.agentSpeed;
         }
-        else if (states.distanceToPlayer > states.chaseDistance)
+        else if (states.distanceToPlayer > states.chaseDistance && !IsPlayedInClearFOV())
         {
             states.agent.speed = states.agentSpeed;
             states.currentState = AIStates.FSMStates.Patrol;
             FindNextPoint();
             
         }
+        FaceTarget(states.player.transform.position);
         states.agent.destination = states.nextDestination;
 
     }
-
+    /*
     void UpdateHitState()
     {
         print("hit state");
@@ -120,7 +123,7 @@ public class AIAgent : MonoBehaviour
                 states.currentState = AIStates.FSMStates.Patrol;
             }
         }
-    }
+    }*/
 
 
     
@@ -131,6 +134,14 @@ public class AIAgent : MonoBehaviour
         print(wanderPoints.Length);
         states.nextDestination = wanderPoints[currentDestinationIndex].transform.position;
         currentDestinationIndex = (currentDestinationIndex + 1) % wanderPoints.Length;
+    }
+
+    void FaceTarget(Vector3 target)
+    {
+        Vector3 directionToTarget = (target - transform.position).normalized;
+        directionToTarget.y = 0;
+        Quaternion lookRotation = Quaternion.LookRotation(directionToTarget);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, 10 * Time.deltaTime);
     }
 
     bool IsPlayedInClearFOV()

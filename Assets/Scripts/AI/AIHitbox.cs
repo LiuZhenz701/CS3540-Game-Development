@@ -9,10 +9,9 @@ public class AIHitbox : MonoBehaviour
     public static float blinkDuration = .5f;
     public static float blinkTimer;
     AIRagdoll ragdoll;
-    GameObject levelManager;
+    public GameObject levelManager;
     HealthControl healthControl;
     public static bool gotHitAlready = false; //to be used between all colliders on granny
-    public CinemachineVirtualCamera virtualCamera;
 
 
     // Start is called before the first frame update
@@ -34,6 +33,7 @@ public class AIHitbox : MonoBehaviour
             {
            //     CameraShake.instance.ShakeCamera();
                 gotHitAlready = true;
+                healthControl.enemyHit();
 
                 StartCoroutine(SloMo());
                 StartCoroutine(GetHit());
@@ -45,7 +45,6 @@ public class AIHitbox : MonoBehaviour
     IEnumerator GetHit()
     {
         yield return new WaitForSeconds(.4f);
-        healthControl.enemyHit(10);
         print("hit connected");
         AIAgentAnimHandler.gotHitTrigger = true;
         blinkTimer = blinkDuration;

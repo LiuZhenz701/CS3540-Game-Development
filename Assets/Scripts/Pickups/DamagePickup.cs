@@ -7,15 +7,18 @@ public class DamagePickip : MonoBehaviour
     public float hoverSpeed = 1f;
     public float hoverHeight = 0.5f;
     public float rotationSpeed = 50f;
+    public float respawnTimer = 5f;
 
     public AudioClip pickupSound;
 
-    public GameObject pickupParticleEffectPrefab;
+    public GameObject levelManager;
     
     // Start is called before the first frame update
     void Start()
     {
-        
+        levelManager = GameObject.FindGameObjectWithTag("LevelManager");
+
+        var healthControl = levelManager.GetComponent<HealthControl>();
     }
 
     // Update is called once per frame
@@ -41,13 +44,27 @@ public class DamagePickip : MonoBehaviour
             AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
             //particle effects
-            GameObject particleEffect = Instantiate(pickupParticleEffectPrefab, other.transform.position, Quaternion.identity);
-            Destroy(particleEffect, 10f);
+            
 
             //add damage
+            var healthControl = levelManager.GetComponent<HealthControl>();
+            healthControl.damageMultiplyer = 5;
 
-            Destroy(gameObject, 1f);
+            gameObject.SetActive(false);
+            Invoke("Respawn", respawnTimer);
+            Invoke("ResetDamage", 5f);
         }
+    }
+
+    void ResetDamage()
+    {
+        var healthControl = levelManager.GetComponent<HealthControl>();
+        healthControl.damageMultiplyer = 0;
+    }
+
+    void Respawn()
+    {
+        gameObject.SetActive(true);
     }
 }
 

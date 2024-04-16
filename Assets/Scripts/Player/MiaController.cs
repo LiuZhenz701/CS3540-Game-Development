@@ -4,6 +4,7 @@ using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 namespace TPC
 {
@@ -67,6 +68,8 @@ namespace TPC
         public GameObject punchVFX;
         public GameObject kickVFX;
         public GameObject lightningVFX;
+        public Image speedIcon;
+
 
         #endregion
 
@@ -297,6 +300,8 @@ namespace TPC
         private IEnumerator SpeedBoostCoroutine()
         {
             Debug.Log("Speed boost activated");
+            // Active the speed up icon
+            speedIcon.color = Color.white;
 
             // Apply the speed boost here
             float originalWalkSpeed = walkSpeed;
@@ -308,6 +313,9 @@ namespace TPC
 
             // Revert the speed back to its original value after the duration
             walkSpeed = originalWalkSpeed;
+            sprintSpeed = originalSprintSpeed;
+            // Reset the icon color to black
+            speedIcon.color = Color.black;
 
             // Reset the coroutine reference
             speedBoostCoroutine = null;
