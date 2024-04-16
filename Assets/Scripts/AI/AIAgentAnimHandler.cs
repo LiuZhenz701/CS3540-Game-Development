@@ -78,12 +78,7 @@ public class AIAgentAnimHandler : MonoBehaviour
         if (attackTrigger && !isAttackPlaying)
         {
             float duration = .5f;
-            if (attackNum == 0)
-            {
-                startPosition = transform.position; 
-           //     DoJump();
-                duration = jumpDuration;
-            }
+           
             anim.SetInteger("Attack", attackNum);
             attackTrigger = false;
             isAttackPlaying = true;
@@ -109,7 +104,7 @@ public class AIAgentAnimHandler : MonoBehaviour
 
         if (!isHitPlaying)
         {
-            AudioSource.PlayClipAtPoint(grannyHitSFX, Camera.main.transform.position, .25f);
+            AudioSource.PlayClipAtPoint(grannyHitSFX, Camera.main.transform.position, .35f);
 
             anim.SetInteger("Hit", 0);
             isHitPlaying = true;

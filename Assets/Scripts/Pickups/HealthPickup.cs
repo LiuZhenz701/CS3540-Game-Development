@@ -7,13 +7,17 @@ public class HealthPickup : MonoBehaviour
     public float hoverSpeed = 1f;
     public float hoverHeight = 0.5f;
     public float rotationSpeed = 50f;
+    public float respawnTimer = 5f;
     public int healthAmnt = 20;
 
     public AudioClip pickupSound;
 
-    public GameObject pickupParticleEffectPrefab;
+    public GameObject levelManager;
 
-    public LevelManager levelManager;
+    public void Start()
+    {
+        levelManager = GameObject.FindGameObjectWithTag("LevelManager");
+    }
 
 
 
@@ -47,13 +51,14 @@ public class HealthPickup : MonoBehaviour
                     AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
                     //particle effects
-                    GameObject particleEffect = Instantiate(pickupParticleEffectPrefab, other.transform.position, Quaternion.identity);
-                    Destroy(particleEffect, 5f);
+                    
 
                     //add health
                     healthControl.playerGainHealth(healthAmnt);
 
-                    Destroy(gameObject);
+                    gameObject.SetActive(false);
+                    Invoke("Respawn", respawnTimer);
+
                 }
                 else
                 {
@@ -66,5 +71,13 @@ public class HealthPickup : MonoBehaviour
             }
         }
     }
+    
+    void Respawn()
+    {
+        // Instantiate a new object at the same position
+         gameObject.SetActive(true);
+    }
+
+
 
 }

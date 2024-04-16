@@ -7,10 +7,11 @@ public class SpeedPickup : MonoBehaviour
     public float hoverSpeed = 1f;
     public float hoverHeight = 0.5f;
     public float rotationSpeed = 50f;
+    public float respawnTimer = 5f;
 
     public AudioClip pickupSound;
 
-    public GameObject pickupParticleEffectPrefab;
+    
     
     // Start is called before the first frame update
     void Start()
@@ -41,12 +42,17 @@ public class SpeedPickup : MonoBehaviour
             AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
             //particle effects
-            GameObject particleEffect = Instantiate(pickupParticleEffectPrefab, other.transform.position, Quaternion.identity);
-            Destroy(particleEffect, 10f);
+            
 
             //add speed
 
-            Destroy(gameObject, 1f);
+            gameObject.SetActive(false);
+            Invoke("Respawn", respawnTimer);
         }
+    }
+
+    void Respawn()
+    {
+        gameObject.SetActive(true);
     }
 }

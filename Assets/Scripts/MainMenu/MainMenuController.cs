@@ -3,25 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenuController : MonoBehaviour {
+public class MainMenuController : MonoBehaviour
+{
 
     public static bool inMainMenu = true;
 
-    public void ContinueGame() {
+    public void ContinueGame()
+    {
         string lastScene = PlayerPrefs.GetString("LastScene");
 
-        if (!string.IsNullOrEmpty(lastScene)) {
+        if (!string.IsNullOrEmpty(lastScene))
+        {
             SceneManager.LoadScene(lastScene);
-        } else {
+        }
+        else
+        {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }
 
-    public void StartNewGame() {
+    public void StartNewGame()
+    {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
-    public void ExitGame() {
+    public void ExitGame()
+    {
         Application.Quit();
     }
 }

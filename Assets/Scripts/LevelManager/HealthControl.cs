@@ -13,8 +13,11 @@ public class HealthControl : MonoBehaviour {
 
     public int playerCurHP;
     public int enemyCurHP;
+    public int playerTakesThisDMG;
+    public int enemyTakesThisDMG;
 
     GameObject player;
+    public int damageMultiplyer = 0;
 
 
     public void Start () {
@@ -33,35 +36,32 @@ public class HealthControl : MonoBehaviour {
         enemyHealthBar.value = enemyCurHP;
     }
 
-    public void playerHit(int dmgAmount) {
-        print(dmgAmount);
-        Debug.Log("before: " + playerCurHP);
+    public void playerHit() {
         if (playerCurHP > 0) {
-            playerCurHP -= dmgAmount;
+            playerCurHP -= playerTakesThisDMG;
         }
         
-        Debug.Log("after: " + playerCurHP);
 
-       // AudioSource.PlayClipAtPoint(playerHitSFX, Camera.main.transform.position);
             
         
     }
 
-    public void enemyHit(int dmgAmount)
+    public void playerHitPoison(int damage) {
+        if (playerCurHP > 0) {
+            playerCurHP -= damage;
+        }
+        
+
+            
+        
+    }
+
+    public void enemyHit()
     {
         if (enemyCurHP > 0)
         {
-            enemyCurHP -= dmgAmount;
-      /*      
-            if (player.GetComponent<MiaController>().isPunching)
-            {
-                AudioSource.PlayClipAtPoint(punchConnectedSFX, Camera.main.transform.position, 0.33f);
-            }
-            else if (player.GetComponent<MiaController>().isKicking)
-            {
-                AudioSource.PlayClipAtPoint(kickConnectedSFX, Camera.main.transform.position, 0.33f);
-            }
-            */
+            enemyCurHP -= enemyTakesThisDMG;
+
         }
     }
 

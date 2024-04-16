@@ -11,7 +11,7 @@ public class PoisonTextChange : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        Invoke("ChangeTextOne", 7f);
     }
 
     // Update is called once per frame
@@ -20,26 +20,25 @@ public class PoisonTextChange : MonoBehaviour
         
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        Invoke("ChangeTextOne", 5f);
-    }
+   
+        
+    
 
     void ChangeTextOne()
     {
         HUDText.text = "Lookout for leftover burgers to restore health!";
-        Invoke("ChangeTextTwo", 8f);
+        Invoke("ChangeTextTwo", 5f);
     }
 
     void ChangeTextTwo()
     {
         HUDText.text = "Make it a combo deal with a soda to speed up!";
-        Invoke("ChangeTextThree", 8f);
+        Invoke("ChangeTextThree", 5f);
     }
 
     void ChangeTextThree()
     {
-        HUDText.text = "You are ready to take on the granny army";
+        HUDText.text = "You are ready to take on the granny army!";
         Invoke("LoadLevelTwo", 3f);
     }
 

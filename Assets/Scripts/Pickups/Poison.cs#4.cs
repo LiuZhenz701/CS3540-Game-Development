@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class Poison : MonoBehaviour
 {
-    public int damageAmount = 2;
+    public int damageAmount;
     public float damageSpeed = 5f;
-    public LevelManager LevelManager;
-    bool isHit;
-
+    public GameObject levelManager;
+    bool isInside;
     HealthControl healthControl;
 
 
@@ -16,8 +15,9 @@ public class Poison : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        healthControl = LevelManager.GetComponent<HealthControl>();
-        isHit = false;
+        isInside = false;
+        levelManager = GameObject.FindGameObjectWithTag("LevelManager");
+        healthControl = levelManager.GetComponent<HealthControl>();
     }
 
     // Update is called once per frame
@@ -26,27 +26,32 @@ public class Poison : MonoBehaviour
         
     }
 
-    IEnumerator EndAttackState(float duration)
+    // Coroutine to repeatedly apply damage
+    IEnumerator ApplyDamage()
+    {
+        while (isInside)
         {
-            yield return new WaitForSeconds(duration);
-
-            isHit = false;
+            healthControl.playerHitPoison(damageAmount); // Call your damage method here
+            yield return new WaitForSeconds(damageSpeed);
         }
-    
+    }
+
+    // Trigger when player enters the poison area
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Enter");
-        // Check if the colliding object is the player
         if (other.CompareTag("Player"))
         {
-            if(!isHit)
-            {
-                isHit = true;
-                Debug.Log("before");
-                healthControl.playerHit(damageAmount);
-                Debug.Log("after");
-                StartCoroutine(EndAttackState(damageSpeed));
-            }
+            isInside = true;
+            StartCoroutine(ApplyDamage());
+        }
+    }
+
+    // Trigger when player exits the poison area
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isInside = false;
         }
     }
     

@@ -198,7 +198,7 @@ public class EnemyAI : MonoBehaviour
         if  (distanceToPlayer <= attackDistance && playerIsAttacking)
         {
             currentState = FSMStates.Hit;
-            healthControl.enemyHit(1);
+            healthControl.enemyHit();
             if (!isGettingHit)
             {
                 isGettingHit = true;
