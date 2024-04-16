@@ -11,11 +11,11 @@ GameObject:
   - component: {fileID: 7703823452213402424}
   - component: {fileID: 6721236557137695901}
   - component: {fileID: 8836720253168722007}
-  - component: {fileID: 5015918764048376297}
   - component: {fileID: 815069022801084351}
+  - component: {fileID: 4189864450513040701}
   m_Layer: 0
   m_Name: SpeedPickup
-  m_TagString: Untagged
+  m_TagString: SpeedPickup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7035372692705411458}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.53185, y: 0.65, z: 3.77}
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6721236557137695901
 MeshFilter:
@@ -85,23 +85,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &5015918764048376297
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7035372692705411458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c757c7026d7dad74e840166b87949a77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hoverSpeed: 1
-  hoverHeight: 0.5
-  rotationSpeed: 50
-  pickupSound: {fileID: 8300000, guid: 1f55a6d057996d24d8d05245b3844fe6, type: 3}
-  pickupParticleEffectPrefab: {fileID: 3147715325363015010, guid: 2ff248b632995fa48b4092ddc2afcb3d, type: 3}
 --- !u!65 &815069022801084351
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -110,8 +93,34 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7035372692705411458}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 0.06756927, y: 0.15091003, z: 0.06746003}
   m_Center: {x: -0.000054618344, y: 0.07545502, z: -0.0000000018626451}
+--- !u!114 &4189864450513040701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7035372692705411458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c76f05c7c48e994c8079a82a1bcfb43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSpeed: 1
+  hoverHeight: 2
+  rotationSpeed: 50
+  pickupSound: {fileID: 8300000, guid: 149dc3005cf6b7e4a99f13c568f53027, type: 3}
+  pickupParticleEffectPrefab: {fileID: 2980261651216957464, guid: b229e64151aae0a46bbb54aa98283e89,
+    type: 3}

@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace TPC
 {
@@ -21,6 +23,7 @@ namespace TPC
         public float gravity = 10f;
         public float airControl = 5f;
         public float airtimeThreshold;
+        public float padForce = 10f;
         [Header("Inputs")]
         public float horizontal;
         public float vertical;
@@ -45,6 +48,10 @@ namespace TPC
         public bool hasKickInput;
         public bool isPunching;
         public bool isKicking;
+        public bool isOnJumpPad;
+        private bool hasPlayedAttackSFX = false;
+        private Coroutine speedBoostCoroutine;
+
 
         #endregion
 
@@ -54,6 +61,13 @@ namespace TPC
         public Animator anim;
         public CharacterController controller;
         public Camera mainCamera;
+        public CinemachineFreeLook freeLookCamera;
+        SkinnedMeshRenderer[] skinnedMeshRenderers;
+        public AudioClip missedAttackSFX;
+        public GameObject punchVFX;
+        public GameObject kickVFX;
+        public GameObject lightningVFX;
+
         #endregion
 
         #region Variables
@@ -80,6 +94,8 @@ namespace TPC
             canJump = true;
             //    gameObject.layer = 8;
             //     ignoreLayers
+            skinnedMeshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+            
         }
         void CreateModel()
         {
@@ -90,7 +106,11 @@ namespace TPC
         }
         #endregion
 
-
+        public void Start()
+        {
+          //  punchVFX = GameObject.FindWithTag("MiaLeftPunchVFX");
+           // kickVFX = GameObject.FindWithTag("MiaRightKickVFX");
+        }
         public void FixedTick()
         {
             obstacleAhead = false;
@@ -127,7 +147,34 @@ namespace TPC
         }
         public void RegularTick()
         {
+            UpdateMouseSensitivity();
             onGround = controller.isGrounded;
+            BlinkWhenHitEffect();
+            if (Time.timeScale == .5f)
+            {
+                lightningVFX.SetActive(true);
+                // Trigger the shake effect
+                CinemachineBasicMultiChannelPerlin noise = freeLookCamera.GetRig(0).GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+                if (noise != null)
+                {
+                    noise.m_AmplitudeGain = 1.5f; // Adjust amplitude for intensity
+                    noise.m_FrequencyGain = 2f; // Adjust frequency for speed
+                }
+            }
+            else
+            {
+                lightningVFX.SetActive(false);
+
+                // Stop the shake effect
+                CinemachineBasicMultiChannelPerlin noise = freeLookCamera.GetRig(0).GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+                if (noise != null)
+                {
+                    noise.m_AmplitudeGain = 0f;
+                }
+
+            }
+
+
         }
 
         void UpdateState()
@@ -143,6 +190,7 @@ namespace TPC
             }
             if (isPunching || isKicking)
             {
+               
                 curState = CharStates.inCombo;
             }
             else
@@ -155,6 +203,8 @@ namespace TPC
                 curState = CharStates.inAir;
             }
         }
+
+   
 
         void IsClear(Vector3 origin, Vector3 direction, float distance, ref bool isHit)
         {
@@ -183,7 +233,7 @@ namespace TPC
                     anim.SetInteger(StaticVars.jumpType, (airTime > airtimeThreshold) ? (horizontal != 0 || vertical != 0) ? 2 : 1 : 0);
                 }
                 airTime = 0;
-                print(onGround);
+               // print(onGround);
 
             }
             //add air time if still in air
@@ -201,11 +251,92 @@ namespace TPC
             Vector3 rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot).position;
             Vector3 relativeLeftFoot = transform.InverseTransformPoint(leftFoot);
             Vector3 relativeRightFoot = transform.InverseTransformPoint(rightFoot);
-
+           
             anim.SetBool(StaticVars.mirrorJump, relativeLeftFoot.z > relativeRightFoot.z);
 
         }
-    }
 
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("SpeedPickup"))
+            {
+                Debug.Log("Speed pickup collected");
+
+                // Start the speed boost coroutine if it's not already running
+                if (speedBoostCoroutine == null)
+                {
+                    speedBoostCoroutine = StartCoroutine(SpeedBoostCoroutine());
+                }
+                else
+                {
+                    // Restart the coroutine if the speed boost is already active
+                    StopCoroutine(speedBoostCoroutine);
+                    speedBoostCoroutine = StartCoroutine(SpeedBoostCoroutine());
+                }
+            }
+            else if (other.CompareTag("BouncePad"))
+            {
+                Debug.Log("Bounce Pad hit");
+
+                // Check if the character controller is not null and the player is grounded
+                if (controller != null && controller.isGrounded)
+                {
+                    // Apply vertical force to make the character jump
+                    Vector3 jumpVelocity = Vector3.up * jumpForce;
+                    controller.Move(jumpVelocity * Time.deltaTime * padForce / 2);
+
+                    // Set the isJumping flag to true
+                    isJumping = true;
+                    anim.SetBool("inAir", true);
+
+                }
+            }
+        }
+
+        private IEnumerator SpeedBoostCoroutine()
+        {
+            Debug.Log("Speed boost activated");
+
+            // Apply the speed boost here
+            float originalWalkSpeed = walkSpeed;
+            walkSpeed *= 1.2f; // Double the walk speed temporarily
+            float originalSprintSpeed = sprintSpeed;
+            sprintSpeed *= 1.2f;
+            // Wait for the specified duration (10 seconds in this case)
+            yield return new WaitForSeconds(5f);
+
+            // Revert the speed back to its original value after the duration
+            walkSpeed = originalWalkSpeed;
+
+            // Reset the coroutine reference
+            speedBoostCoroutine = null;
+
+            Debug.Log("Speed boost deactivated");
+        }
+
+        private void BlinkWhenHitEffect()
+        {
+            //glow when hit effect
+            MiaHitbox.blinkTimer -= Time.deltaTime;
+            float lerp = Mathf.Clamp01(MiaHitbox.blinkTimer / MiaHitbox.blinkDuration);
+            float intensity = lerp * MiaHitbox.blinkIntensity + 1f;
+
+            foreach (var smr in skinnedMeshRenderers)
+            {
+               
+                
+                smr.material.color = Color.white * intensity;
+
+                
+            }
+        }
+
+        private void UpdateMouseSensitivity()
+        {
+            print(MouseSensitivity.mouseSensitivity);
+            freeLookCamera.m_XAxis.m_MaxSpeed = MouseSensitivity.mouseSensitivity;
+        }
+    }
 
 }

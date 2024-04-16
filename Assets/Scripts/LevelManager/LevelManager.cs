@@ -21,25 +21,40 @@ public class LevelManager : MonoBehaviour {
     private float timer;
     private float hitCounter;
 
-    //public AudioClip gameWinSFX;
-    //public AudioClip gameLoseSFX;
+    public AudioClip gameWinSFX;
+    public AudioClip gameLoseSFX;
+    public AudioClip backgroundMusic;
+    bool audioClipPlayed = false;
+    public GameObject player;
+
+    public GameObject enemy;
 
     void Start () {
         isGameWin = false;
         timer = gameDuration;
         hitCounter = 0;
+        enemy = GameObject.FindGameObjectWithTag("Granny");
+        player = GameObject.FindGameObjectWithTag("Player");
+
     }
 
     private void Update() {
+        
         if (!isGameWin) {
             if (timer > 0) {
                 timer -= Time.deltaTime;
                     
             }
+            if (enemy.GetComponent<AIStates>().isDead) 
+            {
+                GameWin();
+            }
+            
             if (timer <= 0) {
                 timer = 0;
                 GameLost();
             }
+
         }
         if (!gameLost) {
             SetTimerText();
@@ -63,6 +78,14 @@ public class LevelManager : MonoBehaviour {
         isGameWin = false;
         gameLost = true;
         gameLostText.gameObject.SetActive(true);
+        if (!audioClipPlayed) 
+        {
+            AudioSource.PlayClipAtPoint(gameLoseSFX, Camera.main.transform.position);
+            audioClipPlayed = true;
+        }
+
+
+
         Invoke("LoadCurrentLevel", 3);
     }
 
@@ -73,6 +96,11 @@ public class LevelManager : MonoBehaviour {
     public void GameWin() {
         isGameWin = true;
         gameWinText.gameObject.SetActive(true);
+        if (!audioClipPlayed)
+        {
+            AudioSource.PlayClipAtPoint(gameWinSFX, Camera.main.transform.position);
+            audioClipPlayed = true;
+        }
 
         if (!string.IsNullOrEmpty(nextLevel)) {
             Invoke("LoadNextLevel", 3);
