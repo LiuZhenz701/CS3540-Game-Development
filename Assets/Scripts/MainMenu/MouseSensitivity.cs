@@ -1,21 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class MouseSensitivity : MonoBehaviour {
     public Slider mouseSlider;
-    float mouseSensitivity;
+    public static float mouseSensitivity;
 
-    void Start() {
-        mouseSensitivity = mouseSlider.value;
+    private void Start() {
+        if (PlayerPrefs.HasKey("SensitivityValue")) {
+            mouseSlider.value = PlayerPrefs.GetFloat("SensitivityValue");
+            mouseSensitivity = PlayerPrefs.GetFloat("SensitivityValue");
+        }
     }
 
-    void Update() {
-        mouseSensitivity = mouseSlider.value;
-    }
-    
-    public float getMouseSensitivity() {
-        return mouseSensitivity;
+    private void Update() {
+        PlayerPrefs.SetFloat("SensitivityValue", mouseSlider.value * 100);
+        mouseSensitivity = PlayerPrefs.GetFloat("SensitivityValue");
     }
 }

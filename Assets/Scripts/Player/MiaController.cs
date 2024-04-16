@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace TPC
 {
@@ -47,6 +49,7 @@ namespace TPC
         public bool isPunching;
         public bool isKicking;
         public bool isOnJumpPad;
+        private bool hasPlayedAttackSFX = false;
         private Coroutine speedBoostCoroutine;
 
 
@@ -58,6 +61,13 @@ namespace TPC
         public Animator anim;
         public CharacterController controller;
         public Camera mainCamera;
+        public CinemachineFreeLook freeLookCamera;
+        SkinnedMeshRenderer[] skinnedMeshRenderers;
+        public AudioClip missedAttackSFX;
+        public GameObject punchVFX;
+        public GameObject kickVFX;
+        public GameObject lightningVFX;
+
         #endregion
 
         #region Variables
@@ -84,6 +94,8 @@ namespace TPC
             canJump = true;
             //    gameObject.layer = 8;
             //     ignoreLayers
+            skinnedMeshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+            
         }
         void CreateModel()
         {
@@ -94,7 +106,11 @@ namespace TPC
         }
         #endregion
 
-
+        public void Start()
+        {
+          //  punchVFX = GameObject.FindWithTag("MiaLeftPunchVFX");
+           // kickVFX = GameObject.FindWithTag("MiaRightKickVFX");
+        }
         public void FixedTick()
         {
             obstacleAhead = false;
@@ -131,7 +147,34 @@ namespace TPC
         }
         public void RegularTick()
         {
+            UpdateMouseSensitivity();
             onGround = controller.isGrounded;
+            BlinkWhenHitEffect();
+            if (Time.timeScale == .5f)
+            {
+                lightningVFX.SetActive(true);
+                // Trigger the shake effect
+                CinemachineBasicMultiChannelPerlin noise = freeLookCamera.GetRig(0).GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+                if (noise != null)
+                {
+                    noise.m_AmplitudeGain = 1.5f; // Adjust amplitude for intensity
+                    noise.m_FrequencyGain = 2f; // Adjust frequency for speed
+                }
+            }
+            else
+            {
+                lightningVFX.SetActive(false);
+
+                // Stop the shake effect
+                CinemachineBasicMultiChannelPerlin noise = freeLookCamera.GetRig(0).GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+                if (noise != null)
+                {
+                    noise.m_AmplitudeGain = 0f;
+                }
+
+            }
+
+
         }
 
         void UpdateState()
@@ -147,6 +190,7 @@ namespace TPC
             }
             if (isPunching || isKicking)
             {
+               
                 curState = CharStates.inCombo;
             }
             else
@@ -159,6 +203,8 @@ namespace TPC
                 curState = CharStates.inAir;
             }
         }
+
+   
 
         void IsClear(Vector3 origin, Vector3 direction, float distance, ref bool isHit)
         {
@@ -187,7 +233,7 @@ namespace TPC
                     anim.SetInteger(StaticVars.jumpType, (airTime > airtimeThreshold) ? (horizontal != 0 || vertical != 0) ? 2 : 1 : 0);
                 }
                 airTime = 0;
-                print(onGround);
+               // print(onGround);
 
             }
             //add air time if still in air
@@ -205,7 +251,7 @@ namespace TPC
             Vector3 rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot).position;
             Vector3 relativeLeftFoot = transform.InverseTransformPoint(leftFoot);
             Vector3 relativeRightFoot = transform.InverseTransformPoint(rightFoot);
-
+           
             anim.SetBool(StaticVars.mirrorJump, relativeLeftFoot.z > relativeRightFoot.z);
 
         }
@@ -238,7 +284,7 @@ namespace TPC
                 {
                     // Apply vertical force to make the character jump
                     Vector3 jumpVelocity = Vector3.up * jumpForce;
-                    controller.Move(jumpVelocity * Time.deltaTime * padForce);
+                    controller.Move(jumpVelocity * Time.deltaTime * padForce / 2);
 
                     // Set the isJumping flag to true
                     isJumping = true;
@@ -269,8 +315,28 @@ namespace TPC
             Debug.Log("Speed boost deactivated");
         }
 
+        private void BlinkWhenHitEffect()
+        {
+            //glow when hit effect
+            MiaHitbox.blinkTimer -= Time.deltaTime;
+            float lerp = Mathf.Clamp01(MiaHitbox.blinkTimer / MiaHitbox.blinkDuration);
+            float intensity = lerp * MiaHitbox.blinkIntensity + 1f;
 
+            foreach (var smr in skinnedMeshRenderers)
+            {
+               
+                
+                smr.material.color = Color.white * intensity;
+
+                
+            }
+        }
+
+        private void UpdateMouseSensitivity()
+        {
+            print(MouseSensitivity.mouseSensitivity);
+            freeLookCamera.m_XAxis.m_MaxSpeed = MouseSensitivity.mouseSensitivity;
+        }
     }
-
 
 }

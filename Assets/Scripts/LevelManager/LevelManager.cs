@@ -25,11 +25,16 @@ public class LevelManager : MonoBehaviour {
     public AudioClip gameLoseSFX;
     public AudioClip backgroundMusic;
     bool audioClipPlayed = false;
+    public GameObject player;
+
+    public GameObject enemy;
 
     void Start () {
         isGameWin = false;
         timer = gameDuration;
         hitCounter = 0;
+        enemy = GameObject.FindGameObjectWithTag("Granny");
+        player = GameObject.FindGameObjectWithTag("Player");
 
     }
 
@@ -40,10 +45,16 @@ public class LevelManager : MonoBehaviour {
                 timer -= Time.deltaTime;
                     
             }
+            if (enemy.GetComponent<AIStates>().isDead) 
+            {
+                GameWin();
+            }
+            
             if (timer <= 0) {
                 timer = 0;
                 GameLost();
             }
+
         }
         if (!gameLost) {
             SetTimerText();

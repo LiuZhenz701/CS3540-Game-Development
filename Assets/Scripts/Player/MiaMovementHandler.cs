@@ -41,8 +41,8 @@ public class MiaMovementHandler : MonoBehaviour
         //if movement isnt being overrided, move regularly.
         if (!overrideForce)
         {
-            MovementNormal();
             HandleAttacks();
+            MovementNormal();
             HandleJump();
 
         }
@@ -74,7 +74,7 @@ public class MiaMovementHandler : MonoBehaviour
         }
             
 
-        if (h != Vector3.zero || v != Vector3.zero)
+        else if (h != Vector3.zero || v != Vector3.zero)
         {
             miaController.curState = MiaController.CharStates.moving;
         }
@@ -244,16 +244,9 @@ public class MiaMovementHandler : MonoBehaviour
             {
                 miaController.isPunching = true;
                 miaController.anim.SetBool(StaticVars.punchOne, true);
-                //miaController.anim.SetBool(StaticVars.punchComboOver, false);
+                miaController.punchVFX.SetActive(true);
                 StartCoroutine(EndPunchState(.4f));
             }
-            // Else continue punch combo
-            //else
-            //{
-             //   miaController.inPunchCombo = true;
-              //  miaController.anim.SetBool(StaticVars.punchOne, true);
-              //  StartCoroutine(EndPunchState(.5f));
-            //}
             
         }
 
@@ -264,17 +257,12 @@ public class MiaMovementHandler : MonoBehaviour
             if (!miaController.isKicking)
             {
                 miaController.isKicking = true;
+                miaController.kickVFX.SetActive(true);
+
                 miaController.anim.SetBool(StaticVars.kickOne, true);
-                //miaController.anim.SetBool(StaticVars.kickComboOver, false);
                 StartCoroutine(EndKickState(.4f));
             }
-            // Else continue kick combo
-         //   else
-         //   {
-          //      miaController.isKicking = true;
-           //     miaController.anim.SetBool(StaticVars.kickOne, true);
-          //      StartCoroutine(EndKickState(miaController.anim.GetCurrentAnimatorStateInfo(0).length));
-           // }
+           
             
         }
     }
@@ -301,6 +289,8 @@ public class MiaMovementHandler : MonoBehaviour
         miaController.anim.SetBool(StaticVars.punchOne, false);
        // miaController.anim.SetBool(StaticVars.punchComboOver, true);
         miaController.isPunching = false;
+        miaController.punchVFX.SetActive(false);
+
     }
 
     // Method to end kick animation after delay
@@ -309,6 +299,8 @@ public class MiaMovementHandler : MonoBehaviour
         miaController.anim.SetBool(StaticVars.kickOne, false);
         //miaController.anim.SetBool(StaticVars.kickComboOver, true);
         miaController.isKicking = false;
+        miaController.kickVFX.SetActive(false);
+
     }
 
 

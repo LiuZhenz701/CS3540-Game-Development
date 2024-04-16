@@ -7,6 +7,7 @@ public class PauseMenuBehavior : MonoBehaviour {
 
     public static bool gamePaused = false;
     public GameObject pauseMenu;
+    public GameObject gameHUD;
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.Escape)) {
@@ -23,6 +24,7 @@ public class PauseMenuBehavior : MonoBehaviour {
         gamePaused = false;
         Time.timeScale = 1f;
         pauseMenu.SetActive(false);
+        gameHUD.SetActive(true);
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -32,12 +34,14 @@ public class PauseMenuBehavior : MonoBehaviour {
         gamePaused = true;
         Time.timeScale = 0f;
         pauseMenu.SetActive(true);
+        gameHUD.SetActive(false);
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }
 
     public void LoadMainMenu() {
+        PlayerPrefs.SetString("LastScene", SceneManager.GetActiveScene().name);
         SceneManager.LoadScene(0);
         Time.timeScale = 1f;
         gamePaused = false;

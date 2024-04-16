@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3942670995915892670}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.00022256374, y: 0.06567738, z: 0.0008418858}
   m_LocalScale: {x: 0.020861106, y: 0.023088118, z: 0.005633183}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6531288505698532083}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &844049603151928884
 MeshFilter:
@@ -94,9 +94,11 @@ GameObject:
   - component: {fileID: 6531288505698532083}
   - component: {fileID: 7857681700389631318}
   - component: {fileID: 5397811088385327516}
+  - component: {fileID: 1900565726845392168}
+  - component: {fileID: 7192342478273635862}
   m_Layer: 0
   m_Name: DamagePickup
-  m_TagString: Untagged
+  m_TagString: DamagePickup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -108,14 +110,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5901999086666571849}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.8311296, y: 0.045291662, z: 5.4114127}
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7852803822824062194}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7857681700389631318
 MeshFilter:
@@ -167,3 +169,44 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1900565726845392168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5901999086666571849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c01f82df7b85b3469737f704898da32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSpeed: 1
+  hoverHeight: 2
+  rotationSpeed: 50
+  pickupSound: {fileID: 8300000, guid: 149dc3005cf6b7e4a99f13c568f53027, type: 3}
+  pickupParticleEffectPrefab: {fileID: 2980261651216957464, guid: 01c410b22f7774b43a8864e7cd770cc2,
+    type: 3}
+--- !u!136 &7192342478273635862
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5901999086666571849}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.08
+  m_Height: 0.04112985
+  m_Direction: 1
+  m_Center: {x: -0.00000023841858, y: 0.020564925, z: 0.000081105565}

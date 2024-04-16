@@ -5,17 +5,17 @@ using UnityEngine.UI;
 
 public class VolumeController : MonoBehaviour {
     public Slider volumeSlider;
-    float volume;
+    public static float volume;
 
-    void Start() {
-        volume = volumeSlider.value;
+    private void Start() {
+        if (PlayerPrefs.HasKey("VolumeValue")) {
+            volumeSlider.value = PlayerPrefs.GetFloat("VolumeValue");
+            volume = PlayerPrefs.GetFloat("VolumeValue");
+        }
     }
 
-    void Update() {
-        volume = volumeSlider.value;
-    }
-
-    public float getVolume() {
-        return volume;
+    private void Update() {
+        PlayerPrefs.SetFloat("VolumeValue", volumeSlider.value);
+        volume = PlayerPrefs.GetFloat("VolumeValue");
     }
 }
